@@ -7,10 +7,10 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 // =====================
 // Database Connection
 // =====================
-$host = "localhost";
-$db = "tripsure";
-$user = "root";
-$pass = "j1k2h3bass";
+$host = "";
+$db = "";
+$user = "";
+$pass = "";
 
 $dsn = "mysql:host={$host};dbname={$db};charset=utf8mb4";
 
@@ -147,7 +147,7 @@ if ($method === 'GET'
         http_response_code(404);
         echo json_encode(['error' => 'Customer not found']);
         exit;
-    }f
+    }
 
     // Fetch vehicle details
     $stmt = $pdo->prepare("SELECT year, value FROM vehicle WHERE id = :vid AND customer_id = :cid");
