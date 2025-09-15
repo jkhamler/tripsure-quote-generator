@@ -1,3 +1,4 @@
+# Customer Table
 CREATE TABLE `customer`
 (
     `id`            BIGINT       NOT NULL AUTO_INCREMENT,
@@ -13,7 +14,7 @@ CREATE TABLE `customer`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-
+# Vehicle Table
 CREATE TABLE `vehicle`
 (
     `id`          BIGINT        NOT NULL AUTO_INCREMENT,
@@ -25,11 +26,14 @@ CREATE TABLE `vehicle`
     `updated_at`  TIMESTAMP     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_vehicle_customer` FOREIGN KEY (`customer_id`)
-        REFERENCES `customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+        REFERENCES `customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    KEY `idx_vehicle_customer` (`customer_id`),
+    KEY `idx_vehicle_year` (`year`),
+    KEY `idx_vehicle_value` (`value`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-
+# Quote Table
 CREATE TABLE `quote`
 (
     `id`           BIGINT         NOT NULL AUTO_INCREMENT,
@@ -43,10 +47,12 @@ CREATE TABLE `quote`
     KEY `idx_quote_customer` (`customer_id`),
     KEY `idx_quote_vehicle` (`vehicle_id`),
     KEY `idx_quote_validity` (`valid_from`, `valid_until`),
+    KEY `idx_quote_created` (`created_at`),
+    KEY `idx_quote_customer_vehicle` (`customer_id`, `vehicle_id`),
     CONSTRAINT `fk_quote_customer` FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_quote_vehicle` FOREIGN KEY (`vehicle_id`)
         REFERENCES `vehicle` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `quote_chk_1` CHECK (`quote_amount` >= 0)
+    CONSTRAINT `quote_chk_amount` CHECK (`quote_amount` >= 0)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
