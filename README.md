@@ -12,7 +12,7 @@ This is a simple REST API for storing customer and vehicle details and generatin
 ### Installing
 
 * Import Postman collection 'Tripsure-Quote-Collection.json' and environment 'Tripsure.postman_environment.json' to Postman client
-* Start MySQL locally and add the local database connection details to lines 10-14 in api.php
+* Start MySQL locally and add the local database connection details to lines 10-13 in api.php
 * Import schema.sql into your local database and ensure tables are present
 * Start up the local PHP server routing all requests through 'api.php'
 

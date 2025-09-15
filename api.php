@@ -23,12 +23,14 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Database connection failed']);
-    exit;
+    generateResponse(
+        ['error' => 'Database connection failed'],
+        500
+    );
 }
 
-function respond(array $data, int $status = 200): void
+/** Helper Functions */
+function generateResponse(array $data, int $status = 200): void
 {
     http_response_code($status);
     echo json_encode($data);
@@ -47,11 +49,15 @@ if ($method === 'POST' && $uri === '/api/customer') {
     $data = json_decode(file_get_contents("php://input"), true);
 
     if (!$data) {
-        http_response_code(400);
-        echo json_encode(["error" => "Invalid JSON"]);
-        exit;
+        generateResponse(
+            ["error" => "Invalid JSON"],
+            400
+        );
     } elseif (!isset($data['first_name'], $data['last_name'], $data['date_of_birth'], $data['email'])) {
-        respond(['error' => 'Missing required fields'], 400);
+        generateResponse(
+            ['error' => 'Missing required fields'],
+            400
+        );
     }
 
     $sql = "INSERT INTO customer (first_name, last_name, date_of_birth, email, phone)
@@ -67,14 +73,15 @@ if ($method === 'POST' && $uri === '/api/customer') {
             ':email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
             ':phone' => $data['phone'] ?? null
         ]);
-        respond([
+        generateResponse([
             "message" => "Customer created successfully",
             'customer_id' => $pdo->lastInsertId()
         ]);
     } catch (PDOException $e) {
-        respond(['error' => 'Customer creation failed: ' . $e->getMessage()], 500);
+        generateResponse(
+            ['error' => 'Customer creation failed: ' . $e->getMessage()],
+            400);
     }
-    exit;
 }
 
 // Split URI into parts
@@ -94,11 +101,9 @@ if ($method === 'POST'
     $data = json_decode(file_get_contents("php://input"), true);
 
     if (!$data) {
-        http_response_code(400);
-        echo json_encode(["error" => "Invalid JSON"]);
-        exit;
+        generateResponse(["error" => "Invalid JSON"], 400);
     } elseif (!isset($data['model_name'], $data['year'], $data['value'])) {
-        respond(['error' => 'Missing required fields'], 400);
+        generateResponse(['error' => 'Missing required fields'], 400);
     }
 
     $sql = "INSERT INTO vehicle (customer_id, model_name, year, value)
@@ -113,17 +118,15 @@ if ($method === 'POST'
             ':year' => (int)$data['year'],
             ':value' => (float)$data['value']
         ]);
-        respond(['vehicle_id' => $pdo->lastInsertId()]);
-        respond([
+        generateResponse(['vehicle_id' => $pdo->lastInsertId()]);
+        generateResponse([
             "message" => "Customer vehicle created successfully",
             'vehicle_id' => $pdo->lastInsertId()
         ]);
 
-
     } catch (PDOException $e) {
-        respond(['error' => 'Vehicle creation failed: ' . $e->getMessage()], 500);
+        generateResponse(['error' => 'Vehicle creation failed: ' . $e->getMessage()], 500);
     }
-    exit;
 }
 
 // ---------------------
@@ -144,9 +147,7 @@ if ($method === 'GET'
     $stmt->execute([':id' => $customerId]);
     $customer = $stmt->fetch();
     if (!$customer) {
-        http_response_code(404);
-        echo json_encode(['error' => 'Customer not found']);
-        exit;
+        generateResponse(['error' => 'Customer not found'], 404);
     }
 
     // Fetch vehicle details
@@ -154,9 +155,7 @@ if ($method === 'GET'
     $stmt->execute([':vid' => $vehicleId, ':cid' => $customerId]);
     $vehicle = $stmt->fetch();
     if (!$vehicle) {
-        http_response_code(404);
-        echo json_encode(['error' => 'Vehicle not found']);
-        exit;
+        generateResponse(['error' => 'Vehicle not found'], 404);
     }
 
     // ---------------------
@@ -166,9 +165,7 @@ if ($method === 'GET'
     try {
         $dob = new DateTime($customer['date_of_birth']);
     } catch (Exception $e) {
-        http_response_code(404);
-        echo json_encode(['error' => 'Invalid customer date of birth - ' . $e->getMessage()]);
-        exit;
+        generateResponse(['error' => 'Invalid customer date of birth - ' . $e->getMessage()], 500);
     }
     $today = new DateTime();
     $age = $today->diff($dob)->y; // calculate customer age in years
@@ -207,7 +204,7 @@ if ($method === 'GET'
         ':created_at' => $now
     ]);
 
-    echo json_encode([
+    generateResponse([
         'quote_id' => $pdo->lastInsertId(),
         'customer_id' => $customerId,
         'vehicle_id' => $vehicleId,
@@ -216,11 +213,9 @@ if ($method === 'GET'
         'valid_until' => $validUntil->format('Y-m-d'),
         'generated_at' => $now
     ]);
-    exit;
 }
 
 // ---------------------
 // Fallback for others
 // ---------------------
-http_response_code(404);
-echo json_encode(["error" => "Endpoint not found"]);
+generateResponse(["error" => "Endpoint not found"], 404);
