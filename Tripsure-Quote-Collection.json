@@ -1,0 +1,94 @@
+{
+	"info": {
+		"_postman_id": "033aacdb-3e4b-4538-a446-319583e8c68f",
+		"name": "Insurance Quote API",
+		"description": "Postman collection for testing the Insurance Quote API (api.php)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2259626"
+	},
+	"item": [
+		{
+			"name": "Create Customer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"first_name\": \"Alice\",\n  \"last_name\": \"Smith\",\n  \"date_of_birth\": \"1988-05-22\",\n  \"email\": \"alice.smith1@example.com\",\n  \"phone\": \"1234567890\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/customer",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Vehicle",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"model_name\": \"Morris Minor\",\n  \"year\": 1967,\n  \"value\": 6500\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/customer/{{customer_id}}/vehicle",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"{{customer_id}}",
+						"vehicle"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Quote",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/quote/{{customer_id}}/{{vehicle_id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"quote",
+						"{{customer_id}}",
+						"{{vehicle_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "customer_id",
+			"value": "1"
+		},
+		{
+			"key": "vehicle_id",
+			"value": "1"
+		}
+	]
+}
